@@ -27,7 +27,9 @@ MONKEYDEV_TARGET_APP=${MONKEYDEV_TARGET_APP:=Optional}
 MONKEYDEV_ADD_SUBSTRATE=${MONKEYDEV_ADD_SUBSTRATE:=YES}
 MONKEYDEV_DEFAULT_BUNDLEID=${MONKEYDEV_DEFAULT_BUNDLEID:=NO}
 
-function isRelease() {
+function isRelease()
+{
+    #true 是 bash 的内建命令，它的返回值（$? 的值）是 0（代表执行成功）。和 true 相对应的命令是 false 命令，它也是 bash 的内建命令，它的返回值是 1（代表执行失败）。
 	if [[ "${CONFIGURATION}" = "Release" ]]; then
 		true
 	else
@@ -35,18 +37,21 @@ function isRelease() {
 	fi
 }
 
-function panic() { # args: exitCode, message...
+function panic()
+{ # args: exitCode, message...
 	local exitCode=$1
 	set +e
-	
+
 	shift
-	[[ "$@" == "" ]] || \
+    #如果$@不为"", 则输出$@到 标准错误管道
+	[[ "$*" == "" ]] || \
 		echo "$@" >&2
 
 	exit ${exitCode}
 }
 
-function checkApp(){
+function checkApp()
+{
 	local TARGET_APP_PATH="$1"
 
 	# remove Plugin an Watch
@@ -64,24 +69,28 @@ function checkApp(){
 	fi
 }
 
-function pack(){
+# 打包
+function pack()
+{
 	TARGET_INFO_PLIST=${SRCROOT}/${TARGET_NAME}/Info.plist
 	# environment
 	CURRENT_EXECUTABLE=$(/usr/libexec/PlistBuddy -c "Print CFBundleExecutable" "${TARGET_INFO_PLIST}" 2>/dev/null)
 
 	# create tmp dir
-	rm -rf "${TEMP_PATH}" || true
+	rm -rf "${TEMP_PATH}" || true       #保证执行完该命令之后, $?始终为0
 	mkdir -p "${TEMP_PATH}" || true
 
 	# latestbuild
-	ln -fhs "${BUILT_PRODUCTS_DIR}" "${PROJECT_DIR}"/LatestBuild
+	ln -fhs "${BUILT_PRODUCTS_DIR}" "${PROJECT_DIR}"/LatestBuild    #"${PROJECT_DIR}"/LatestBuild 指向生成目录
 	cp -rf "${CREATE_IPA}" "${PROJECT_DIR}"/LatestBuild/
 
 	# deal ipa or app
-	TARGET_APP_PATH=$(find "${SRCROOT}/${TARGET_NAME}" -type d | grep "\.app$" | head -n 1)
-	TARGET_IPA_PATH=$(find "${SRCROOT}/${TARGET_NAME}" -type f | grep "\.ipa$" | head -n 1)
+	TARGET_APP_PATH=$(find "${SRCROOT}/${TARGET_NAME}" -type d | grep "\.app$" | head -n 1)     #工程根目录下以.app结尾的第一个文件夹. 包括子目录
+	TARGET_IPA_PATH=$(find "${SRCROOT}/${TARGET_NAME}" -type f | grep "\.ipa$" | head -n 1)     #工程根目录下以.ipa结尾的第一个文件.  包括子目录
 
-	if [[ ${TARGET_APP_PATH} ]]; then
+    #工程目录(包括子目录)下以.app结尾的第一个文件夹, 如果存在就复制到targetApp目录下
+	#if [[ ${TARGET_APP_PATH} ]]; then
+    if [ -n "${TARGET_APP_PATH}" ]; then
 		cp -rf "${TARGET_APP_PATH}" "${TARGET_APP_PUT_PATH}"
 	fi
 
@@ -95,7 +104,7 @@ function pack(){
 		unzip -oqq "${TARGET_IPA_PATH}" -d "${TEMP_PATH}"
 		cp -rf "${TEMP_PATH}/Payload/"*.app "${TARGET_APP_PUT_PATH}"
 	fi
-	
+
 	if [ -f "${BUILD_APP_PATH}/embedded.mobileprovision" ]; then
 		mv "${BUILD_APP_PATH}/embedded.mobileprovision" "${BUILD_APP_PATH}"/..
 	fi
@@ -192,7 +201,7 @@ function pack(){
 		done
 	fi
 
-	if [[ ${MONKEYDEV_DEFAULT_BUNDLEID} = NO ]];then 
+	if [[ ${MONKEYDEV_DEFAULT_BUNDLEID} = NO ]];then
 		/usr/libexec/PlistBuddy -c "Set :CFBundleIdentifier ${PRODUCT_BUNDLE_IDENTIFIER}" "${TARGET_INFO_PLIST}"
 	else
 		/usr/libexec/PlistBuddy -c "Set :CFBundleIdentifier ${ORIGIN_BUNDLE_ID}" "${TARGET_INFO_PLIST}"
@@ -222,11 +231,13 @@ function pack(){
 	fi
 }
 
+#是否只签名
 if [[ "$1" == "codesign" ]]; then
 	${MONKEYPARSER} codesign -i "${EXPANDED_CODE_SIGN_IDENTITY}" -t "${BUILD_APP_PATH}"
 	if [[ ${MONKEYDEV_INSERT_DYLIB} == "NO" ]];then
 		rm -rf "${BUILD_APP_PATH}/Frameworks/lib${TARGET_NAME}Dylib.dylib"
 	fi
 else
+    #打包
 	pack
 fi
