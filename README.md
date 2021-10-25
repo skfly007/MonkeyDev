@@ -2,6 +2,8 @@
 
 ##  我的! 都是我的!!!
 
+
+
 A modified version of iOSOpenDev
 
 * easy to install
@@ -46,3 +48,8 @@ Plese Read Wiki: [Wiki](https://github.com/AloneMonkey/MonkeyDev/wiki)
 #### 亚马逊: [https://www.amazon.cn/dp/B07D5952BR/](https://www.amazon.cn/dp/B07D5952BR/)
 
 <h3>请大家多多支持正版哦~</h3>
+
+
+
+## TODO
+1. monkeydev  template frida-ios-dump整合一下, 整合成一个工程, git clone之后直接创建ln, 然后启用命令行就可以用的那种

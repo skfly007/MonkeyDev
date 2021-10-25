@@ -3,6 +3,8 @@
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
     <content url="file://$MODULE_DIR$" />
+    <content url="file://$MODULE_DIR$/../MonkeyDev-Xcode-Templates" />
+    <content url="file://$MODULE_DIR$/../frida-ios-dump" />
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
