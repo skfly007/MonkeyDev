@@ -308,7 +308,8 @@ function readXcodeSpecificationById(){ #args: filePath, id
 	content=`/usr/libexec/PlistBuddy -x -c Print "$filePath"` || panic $? "Failed to get $filePath content"
 	for (( i=0; i<=1; i++)); do
 	  #/usr/libexec/PlistBuddy -x -c "Print 0" "/Applications/Xcode_13.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Xcode/PrivatePlugIns/IDEOSXSupportCore.ideplugin/Contents/Resources/MacOSX Package Types.xcspec"
-		#???这是想做什么?
+		#打印数组中的第i个元素的内容, 并判断内容中是否包含 指定标志, 如果包含就返回元素的内容
+		#echo "/usr/libexec/PlistBuddy -x -c 'Print $i' '$filePath'"
 		dict=`/usr/libexec/PlistBuddy -x -c "Print $i" "$filePath"`
 		if echo $dict | grep -qE "<string>$id</string>"; then
 			echo "$dict"
@@ -323,10 +324,11 @@ function writeDictToSpecification(){ #args: filePath, content
 	tempfile=`getTempDir`/dictfile
 	echo "$content" >> $tempfile
 	/usr/libexec/PlistBuddy -x -c 'add 0 dict' "$filePath" > /dev/null
+	#合并指定你内容到指定文件
 	/usr/libexec/PlistBuddy -x -c "merge $tempfile 0" "$filePath" > /dev/null
 }
 
-# start it
+echo "在/opt/目录下下载Monkey工程, 在MonkeyDev工程里下载 ./template和frida-ios-dump"
 # 创建/opt/MonkeyDev
 mkdir -p "$MonkeyDevPath" || panic $? "Failed to make directory: $MonkeyDevPath"    #如果创建目录失败, 就报错退出.
 
@@ -348,8 +350,7 @@ downloadFile "https://raw.githubusercontent.com/skfly007/frida-ios-dump/master/d
 
 chmod +x "$MonkeyDevPath/bin/dump.py"
 
-#创建符号链接
-echo "Creating symlink to Xcode templates..."
+echo "创建xcode工程模板符号链接"
 
 #$userHome/Library/Developer/Xcode/Templates/MonkeyDev linkto $MonkeyDevPath/templates
 userDevDir="$userHome/Library/Developer"
@@ -364,11 +365,11 @@ fi
 
 ln -fhs "$MonkeyDevPath/templates" "$userTemplatesDir/MonkeyDev"
 
-#修改用户profile文件 添加MonkeyDev相关的环境变量
-echo "Modifying Bash personal initialization file..."
+
+echo "修改用户profile文件 添加MonkeyDev相关的环境变量..."
 
 userBashProfileFile=`determineUserBashProfileFile`
-
+echo "选中的profile文件为: $userBashProfileFile"
 addToFileIfMissing "$userBashProfileFile" "^(export)? *MonkeyDevPath=.*" "export MonkeyDevPath=$MonkeyDevPath"
 addToFileIfMissing "$userBashProfileFile" "^(export)? *MonkeyDevDeviceIP=.*" "export MonkeyDevDeviceIP="
 addToFileIfMissing "$userBashProfileFile" "^(export)? *PATH=.*(\\\$MonkeyDevPath\\/bin|${MonkeyDevPath//\//\\/}\\/bin).*" "export PATH=$MonkeyDevPath/bin:\$PATH"
@@ -409,7 +410,7 @@ Build version 13A233
 
 case $currXcodeVersion in
 "Xcode 13.0")
-  echo "当前Xcode版本为: Xcode13. 该版本的Command Line Tool 工程处于BETA阶段..."
+  echo "当前Xcode版本为: Xcode13. 该版本的Command Line Tool工程处于BETA阶段..."
   #/Applications/Xcode_13.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Xcode/PrivatePlugIns/IDEOSXSupportCore.ideplugin/Contents/Resources/
   macosxSDKSpecificationsPath=$macosSdkPlatformPath/Developer/Library/Xcode/PrivatePlugIns/IDEOSXSupportCore.ideplugin/Contents/Resources
   #/Applications/Xcode_13.app/Contents/PlugIns/XCBSpecifications.ideplugin/Contents/Resources/Darwin Package Types.xcspec
@@ -432,8 +433,9 @@ if [[ $hasPackageTypeForCommandLineTool != "true" ]]; then
 	echo "筛选结果: $machoDict"
   echo "Package Types.xcspec处理完成"
 	writeDictToSpecification "$specificationFile" "$machoDict"
+else
+  echo "Embedded-Device.xcspec已被处理过, 跳过"
 fi
-
 
 if [[ $hasProductTypeForCommandLineTool != "true" ]]; then
   echo "开始处理Product Types.xcspec"
@@ -441,6 +443,8 @@ if [[ $hasProductTypeForCommandLineTool != "true" ]]; then
 	echo "筛选结果: $toolDict"
   echo "Product Types.xcspec处理完成"
 	writeDictToSpecification "$specificationFile" "$toolDict"
+else
+  echo "Embedded-Device.xcspec已被处理过, 跳过"
 fi
 
 exit 0
