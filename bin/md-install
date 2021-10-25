@@ -2,6 +2,12 @@
 
 # 脚本参数说明: 第一个参数: git分支
 
+# 总共更改了系统的三个地方:
+# 1. 在/opt/目录下下载Monkey工程, 在MonkeyDev工程里下载 ./template和frida-ios-dump
+# 2. 添加环境变量
+# 3. 修正Xcode, 以支持ios command line tools
+
+
 ((0)) && {
 #被注释的内容
 :<<!COMMENT!
@@ -118,8 +124,8 @@ function copyFile()
 #备份原文件
 function requireBackup()
 {
-	[[ ! -f "$1" || -f "${1}${backupFileExt}" ]] || \
-		copyFile "$1" "${1}${backupFileExt}"
+  #如果文件存在, 而且备份文件不存在, 就备份文件. 也就是说, 如果备份文件存在,就不会备份这个文件, 重复安装只会备份一次
+	[[ ! -f "$1" || -f "${1}${backupFileExt}" ]] || copyFile "$1" "${1}${backupFileExt}"
 }
 
 #获取SDK信息

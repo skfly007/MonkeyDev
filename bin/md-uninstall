@@ -90,19 +90,17 @@ function getSdkProperty()
 
 echo "Uninstalling MonkeyDev base, Xcode templates and framework header files..."
 	
-#删除文件夹
-rm -rf "$MonkeyDevPath" || \
-	panic $? "Failed to remove directory: $MonkeyDevPath"
+echo "删除/opt/MonekyDev文件夹"
+rm -rf "$MonkeyDevPath" || panic $? "Failed to remove directory: $MonkeyDevPath"
 
-#移除模块符号链接
+echo "移除xcode工程模板符号链接"
 userDevDir="$userHome/Library/Developer"
 userTemplatesDir="$userDevDir/Xcode/Templates"
 symlinkPath="$userTemplatesDir/MonkeyDev"
 
-rm -f "$symlinkPath" || \
-	panic $? "Failed to remove file: $symlinkPath"
+rm -f "$symlinkPath" || panic $? "Failed to remove file: $symlinkPath"
 		
-#移除profile环境变量
+echo "移除profile文件里的环境变量"
 for f in "${bashProfileFiles[@]}"; do
 	if [[ -f "$f" ]]; then
 		userBashProfileFile="$f"
@@ -117,6 +115,7 @@ if [[ $userBashProfileFile != "" ]]; then
 	sed -i "" "s/^export PATH=.*\$MonkeyDevPath\\/bin:.*$//g" "$userBashProfileFile"
 fi
 
+echo "回复Embedded-Device.xcspec文件"
 iosSdkPlatformPath=`getSdkProperty iphoneos PlatformPath`
 
 specificationFile=$(cd $iosSdkPlatformPath/../../.. && pwd)/PlugIns/IDEiOSSupportCore.ideplugin/Contents/Resources/Embedded-Device.xcspec
