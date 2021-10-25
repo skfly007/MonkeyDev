@@ -427,7 +427,7 @@ requireFile "$packageTypesForMacOSXPath" false
 requireFile "$productTypesForMacOSXPath" false
 
 
-  echo "开始处理Package Types.xcspec"
+echo "开始处理Package Types.xcspec"
 if [[ $hasPackageTypeForCommandLineTool != "true" ]]; then
 	machoDict=`readXcodeSpecificationById "$packageTypesForMacOSXPath" "com.apple.package-type.mach-o-executable"`
 	echo "筛选结果: $machoDict"
@@ -437,7 +437,7 @@ else
   echo "Embedded-Device.xcspec已被处理过, 跳过"
 fi
 
-  echo "开始处理Product Types.xcspec"
+echo "开始处理Product Types.xcspec"
 if [[ $hasProductTypeForCommandLineTool != "true" ]]; then
 	toolDict=`readXcodeSpecificationById "$productTypesForMacOSXPath" "com.apple.product-type.tool"`
 	echo "筛选结果: $toolDict"
