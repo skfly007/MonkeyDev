@@ -14,19 +14,19 @@
 
 ${} 截取字符串
 (1)第一种方法:
-从左向右截取最后一个string后的字符串
-${varible##*string}   # variable=/var/mobile/Media  ${varible##*/} => Media
 从左向右截取第一个string后的字符串
-${varible#*string}    # variable=/var/mobile/Media  ${varible##*/} => Media
+${variable#*string}    # variable=/var/mobile/Media  ${variable#*/} => var/mobile/Media
+从左向右截取最后一个string后的字符串
+${variable##*string}   # variable=/var/mobile/Media  ${variable##*/} => Media
 
-从右向左截取最后一个string后的字符串
-${varible%%string*}
 从右向左截取第一个string后的字符串
-${varible%string*}
+${variable%string*}   # variable=/var/mobile/var/Media  ${variable%var*} => /var/mobile/
+从右向左截取最后一个string后的字符串
+${variable%%string*}  # variable=/var/mobile/var/Media  ${variable%%var*} => /var/
 “*”只是一个通配符可以不要
 
 (2)第二种方法：
-${varible:n1:n2}:截取变量varible从n1开始的n2个字符，组成一个子字符串。可以根据特定字符偏移和长度，使用另一种形式的变量扩展，来选择特定子字符串。
+${variable:n1:n2}:截取变量variable从n1开始的n2个字符，组成一个子字符串。可以根据特定字符偏移和长度，使用另一种形式的变量扩展，来选择特定子字符串。
 
 
 plistbuddy用法:
@@ -39,8 +39,11 @@ https://www.jianshu.com/p/2167f755c47e
 if [[ -d /opt/MonkeyDev/ ]]
 then
   echo "MonkeyDev已经存在, 先卸载之前安装的MonkeyDev"
-  ./md-uninstall
+  #获取当前脚本目录
+  echo ${0%/*}/md-uninstall
+  ${0%/*}/md-uninstall
 fi
+exit 0
 
 #set -e表示一旦脚本中有命令的返回值为非0，则脚本立即退出，后续命令不再执行;
 #set -o pipefail表示在管道连接的命令序列中，只要有任何一个命令返回非0值，则整个管道返回非0值，即使最后一个命令返回0.
