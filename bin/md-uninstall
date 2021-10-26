@@ -115,7 +115,7 @@ if [[ $userBashProfileFile != "" ]]; then
 	sed -i "" "s/^export PATH=.*\$MonkeyDevPath\\/bin:.*$//g" "$userBashProfileFile"
 fi
 
-echo "回复Embedded-Device.xcspec文件"
+echo "恢复Embedded-Device.xcspec文件"
 iosSdkPlatformPath=`getSdkProperty iphoneos PlatformPath`
 
 specificationFile=$(cd $iosSdkPlatformPath/../../.. && pwd)/PlugIns/IDEiOSSupportCore.ideplugin/Contents/Resources/Embedded-Device.xcspec

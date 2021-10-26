@@ -1,4 +1,5 @@
 #!/bin/bash
+echo "已修正!"
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 if [[ ${DIR} = "/opt/MonkeyDev/bin" ]]; then 
