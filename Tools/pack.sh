@@ -325,7 +325,7 @@ function pack()
 }
 
 if [[ "$1" == "codesign" ]]; then
-  echo "仅执行签名动作"
+  echo "仅执行签名动作, 主要用于MonkeyAppLibrary工程"
 	${MONKEYPARSER} codesign -i "${EXPANDED_CODE_SIGN_IDENTITY}" -t "${BUILD_APP_PATH}"
 	if [[ ${MONKEYDEV_INSERT_DYLIB} == "NO" ]];then
 		rm -rf "${BUILD_APP_PATH}/Frameworks/lib${TARGET_NAME}Dylib.dylib"
