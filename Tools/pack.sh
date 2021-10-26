@@ -103,7 +103,7 @@ function checkApp()
 
 	/usr/libexec/PlistBuddy -c 'Delete UISupportedDevices' "${TARGET_APP_PATH}/Info.plist" 2>/dev/null
 
-  echo "执行命令/opt/MonkeyDev/bin/monkeyparser"
+  echo "执行命令/opt/MonkeyDev/bin/monkeyparser  MONKEYDEV_CLASS_DUMP=[${MONKEYDEV_CLASS_DUMP}] MONKEYDEV_RESTORE_SYMBOL=[${MONKEYDEV_RESTORE_SYMBOL}]"
 	VERIFY_RESULT=`export MONKEYDEV_CLASS_DUMP=${MONKEYDEV_CLASS_DUMP};MONKEYDEV_RESTORE_SYMBOL=${MONKEYDEV_RESTORE_SYMBOL};"$MONKEYPARSER" verify -t "${TARGET_APP_PATH}" -o "${SRCROOT}/${TARGET_NAME}"`
   echo "VERIFY_RESULT= $VERIFY_RESULT"
 	if [[ $? -eq 16 ]]; then
