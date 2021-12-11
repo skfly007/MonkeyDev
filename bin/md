@@ -452,13 +452,14 @@ function buildPackage() # args: packageDir, outputDir [, useZOption]
 	packageName=`getPackageFileNameUsingControlFile "$packageDir/DEBIAN/control"`
 
 	# create package #
-	echo "创建deb包, 输出目录为: $outputDir"
+	echo "创建deb包, 输出目录为: ${outputDir}/${packageName}.deb"
 	createDebianPackage "$packageDir" "$packageName" "$outputDir"
 
 	# create zip #
 	if [[ $useZOption == "true" ]]
 	then
 		zipFileName="$outputDir/${packageName}.zip"
+	  echo "创建zip包, 输出文件为: $zipFileName"
 		echo -n "Creating zip $zipFileName... "
 		rm -f "$zipFileName" || panic $? "Failed to remove $zipFileName"
 		pushd "$packageDir" 1> /dev/null
