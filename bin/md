@@ -1,14 +1,26 @@
 #!/bin/bash
 
+# 命令行工程
+#/opt/MonkeyDev/bin/md --xcbp
+
+#set -e表示一旦脚本中有命令的返回值为非0，则脚本立即退出，后续命令不再执行;
+#set -o pipefail表示在管道连接的命令序列中，只要有任何一个命令返回非0值，则整个管道返回非0值，即使最后一个命令返回0.
+
+echo "开始运行自定义脚本"
+
 export setCmd="set -eo pipefail"
 $setCmd
 
 export PATH=/opt/MonkeyDev/bin:$MonkeyDevTheosPath/bin:/usr/local/bin:/usr/bin:/usr/sbin:/bin:/sbin:$PATH
 
 export scriptName="${0##*/}"
+echo "scriptName=[${scriptName}]"
 export scriptVer="4.4"
+echo "scriptVer=[${scriptVer}]"
 export originalArguments=("$@")
+echo "originalArguments=[${originalArguments}]"
 export activeActionArg
+echo "activeActionArg=[${activeActionArg}]"
 
 export MonkeyDevPath="/opt/MonkeyDev"
 #默认设备ip
@@ -23,6 +35,7 @@ export bashProfileFiles=("$userHome/.zshrc" "$userHome/.bash_profile" "$userHome
 
 export tempDirsFile="`mktemp -d -t $scriptName`/tempdirs"
 touch "$tempDirsFile"
+echo "tempDirsFile=[${tempDirsFile}]"
 
 unset LANG
 
@@ -36,6 +49,7 @@ export ActionProperty_Function=5
 export ActionProperty_RequireSudo=6
 export ActionProperty_LongUsage=7
 
+#定义了一个数组, <Linux命令行与shell脚本大全> P121
 export Action_XcodeBuildPhaseLogos=("--xcbp-logos" "" "" 0 0 xcodeBuildPhase_Logos false \
 "        DO NOT USE. For use by Xcode as a Build Phase for projects created from
         MonkeyDev templates only.")
@@ -57,6 +71,12 @@ function cleanup() # no args
 
 	exit $exitCode
 }
+
+# 0
+# 1 SIGHUP
+# 2 SIGINT
+# 3 SIGOUT
+# 15  SIGTERM
 export signals="0 1 2 3 15"
 trap cleanup $signals
 
@@ -913,10 +933,10 @@ ${activeActionArg[$ActionProperty_LongUsage]}
 [[ $1 != "--help" ]] || showUsageAndExit true
 
 #寻找有没有对应的参数
+echo "ActionProperty_ShortArg=${ActionProperty_ShortArg}"
 for n in "${ActionNames[@]}"; do
 	foundArg=false
-	eval [[ "\$1" != "\${Action_$n[$ActionProperty_ShortArg]}" ]] || \
-		foundArg=true
+	eval [[ "\$1" != "\${Action_$n[$ActionProperty_ShortArg]}" ]] || foundArg=true
 
 	if [[ $foundArg == true ]]; then
 		eval activeActionArg=("\"\${Action_$n[@]}\"")
@@ -963,5 +983,7 @@ case "${activeActionArg[$ActionProperty_ShortArg]}" in
 		"${activeActionArg[$ActionProperty_Function]}"
 	;;
 esac
+
+echo "自定义脚本执行完毕"
 
 exit 0
