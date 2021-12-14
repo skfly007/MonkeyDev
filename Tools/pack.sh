@@ -321,6 +321,16 @@ function pack()
 		source "${SRCROOT}/../Pods/Target Support Files/Pods-""${TARGET_NAME}""Dylib/Pods-""${TARGET_NAME}""Dylib-resources.sh"
 	fi
 
+
+# 在这里打包不行的, 还没有签名
+	echo "打包生成ipa文件(未签名)"
+	rm -rf ./tmp_ipa_workspace
+	mkdir -p ./tmp_ipa_workspace/Payload/
+	cp -r "${BUILD_APP_PATH}" ./tmp_ipa_workspace/Payload/
+	cd ./tmp_ipa_workspace
+	zip -r ./out_unsigned.ipa Payload
+
+
 	echo "执行完毕!"
 }
 
@@ -334,3 +344,6 @@ else
   echo "执行全套动作"
 	pack
 fi
+
+
+

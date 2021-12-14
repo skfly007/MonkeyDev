@@ -53,3 +53,7 @@ Plese Read Wiki: [Wiki](https://github.com/AloneMonkey/MonkeyDev/wiki)
 
 ## TODO
 1. monkeydev  template frida-ios-dump整合一下, 整合成一个工程, git clone之后直接创建ln, 然后启用命令行就可以用的那种
+
+
+2. 自动打包ipa  
+   https://www.cnblogs.com/wengzilin/p/4601684.html
