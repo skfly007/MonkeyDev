@@ -422,9 +422,17 @@ case $currXcodeVersion in
   #/Applications/Xcode_13.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Xcode/PrivatePlugIns/IDEOSXSupportCore.ideplugin/Contents/Resources/
   macosxSDKSpecificationsPath=$macosSdkPlatformPath/Developer/Library/Xcode/PrivatePlugIns/IDEOSXSupportCore.ideplugin/Contents/Resources
   #/Applications/Xcode_13.app/Contents/PlugIns/XCBSpecifications.ideplugin/Contents/Resources/Darwin Package Types.xcspec
-  packageTypesForMacOSXPath="/Applications/Xcode_13.app/Contents/PlugIns/XCBSpecifications.ideplugin/Contents/Resources/Darwin Package Types.xcspec"
+  packageTypesForMacOSXPath="/Volumes/disk1t/Applications/Xcode_13.app/Contents/PlugIns/XCBSpecifications.ideplugin/Contents/Resources/Darwin Package Types.xcspec"
   #/Applications/Xcode_13.app/Contents/PlugIns/XCBSpecifications.ideplugin/Contents/Resources/Darwin Product Types.xcspec
-  productTypesForMacOSXPath="/Applications/Xcode_13.app/Contents/PlugIns/XCBSpecifications.ideplugin/Contents/Resources/Darwin Product Types.xcspec";;
+  productTypesForMacOSXPath="/Volumes/disk1t/Applications/Xcode_13.app/Contents/PlugIns/XCBSpecifications.ideplugin/Contents/Resources/Darwin Product Types.xcspec";;
+"Xcode 14.0")
+  echo "当前Xcode版本为: Xcode14. 该版本的Command Line Tool工程处于BETA阶段..."
+  #/Applications/Xcode_13.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Xcode/PrivatePlugIns/IDEOSXSupportCore.ideplugin/Contents/Resources/
+  macosxSDKSpecificationsPath=$macosSdkPlatformPath/Developer/Library/Xcode/PrivatePlugIns/IDEOSXSupportCore.ideplugin/Contents/Resources
+  #/Applications/Xcode_13.app/Contents/PlugIns/XCBSpecifications.ideplugin/Contents/Resources/Darwin Package Types.xcspec
+  packageTypesForMacOSXPath="/Volumes/disk1t/Applications/Xcode_14-beta.app/Contents/PlugIns/XCBSpecifications.ideplugin/Contents/Resources/Darwin Package Types.xcspec"
+  #/Applications/Xcode_13.app/Contents/PlugIns/XCBSpecifications.ideplugin/Contents/Resources/Darwin Product Types.xcspec
+  productTypesForMacOSXPath="/Volumes/disk1t/Applications/Xcode_14-beta.app/Contents/PlugIns/XCBSpecifications.ideplugin/Contents/Resources/Darwin Product Types.xcspec";;
 *)
   echo "无法识别的Xcode版本"
   exit 255;;
