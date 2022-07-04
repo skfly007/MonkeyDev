@@ -384,83 +384,181 @@ addToFileIfMissing "$userBashProfileFile" "^(export)? *PATH=.*(\\\$MonkeyDevPath
 
 
 echo "开始调整xcode配置以支持iphoneos command line tools"
-#/Applications/Xcode_13.app/Contents/Developer/Platforms/iPhoneOS.platform
-iosSdkPlatformPath=`getSdkProperty iphoneos PlatformPath`
-#/Applications/Xcode_13.app/Contents/Developer/Platforms/MacOSX.platform
-macosSdkPlatformPath=`getSdkProperty macosx PlatformPath`
-
-# /Applications/Xcode_13.app/Contents/PlugIns/IDEiOSSupportCore.ideplugin/Contents/Resources/Embedded-Device.xcspec
-specificationFile=$(cd $iosSdkPlatformPath/../../.. && pwd)/PlugIns/IDEiOSSupportCore.ideplugin/Contents/Resources/Embedded-Device.xcspec
-
-requireFile "$specificationFile" false
-
-#backup
-requireBackup "$specificationFile"
-
-hasPackageTypeForCommandLineTool=`doesFileContain "$specificationFile" 'com.apple.package-type.mach-o-executable'`
-hasProductTypeForCommandLineTool=`doesFileContain "$specificationFile" 'com.apple.product-type.tool'`
-
-#/Applications/Xcode_13.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Xcode/Specifications
-macosxSDKSpecificationsPath=$macosSdkPlatformPath/Developer/Library/Xcode/Specifications
-
-#/Applications/Xcode_13.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Xcode/PrivatePlugIns/IDEOSXSupportCore.ideplugin/Contents/Resources/MacOSX Package Types.xcspec
-packageTypesForMacOSXPath="$macosxSDKSpecificationsPath/MacOSX Package Types.xcspec"
-#/Applications/Xcode_13.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Xcode/PrivatePlugIns/IDEOSXSupportCore.ideplugin/Contents/Resources/MacOSX Product Types.xcspec
-productTypesForMacOSXPath="$macosxSDKSpecificationsPath/MacOSX Product Types.xcspec"
-
 
 currXcodeVersion=$(xcodebuild -version| grep Xcode)
 
-:<<!
-Xcode 13.0
-Build version 13A233
-!
 
 case $currXcodeVersion in
 "Xcode 13.0")
+  #Xcode 13.0
+  #Build version 13A233
   echo "当前Xcode版本为: Xcode13. 该版本的Command Line Tool工程处于BETA阶段..."
+  #/Applications/Xcode_13.app/Contents/Developer/Platforms/iPhoneOS.platform
+  iosSdkPlatformPath=`getSdkProperty iphoneos PlatformPath`
+  #/Applications/Xcode_13.app/Contents/Developer/Platforms/MacOSX.platform
+  macosSdkPlatformPath=`getSdkProperty macosx PlatformPath`
+
+  # /Applications/Xcode_13.app/Contents/PlugIns/IDEiOSSupportCore.ideplugin/Contents/Resources/Embedded-Device.xcspec
+  specificationFile=$(cd $iosSdkPlatformPath/../../.. && pwd)/PlugIns/IDEiOSSupportCore.ideplugin/Contents/Resources/Embedded-Device.xcspec
+
+  requireFile "$specificationFile" false
+
+  #backup
+  requireBackup "$specificationFile"
+
+  hasPackageTypeForCommandLineTool=`doesFileContain "$specificationFile" 'com.apple.package-type.mach-o-executable'`
+  hasProductTypeForCommandLineTool=`doesFileContain "$specificationFile" 'com.apple.product-type.tool'`
+
   #/Applications/Xcode_13.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Xcode/PrivatePlugIns/IDEOSXSupportCore.ideplugin/Contents/Resources/
   macosxSDKSpecificationsPath=$macosSdkPlatformPath/Developer/Library/Xcode/PrivatePlugIns/IDEOSXSupportCore.ideplugin/Contents/Resources
   #/Applications/Xcode_13.app/Contents/PlugIns/XCBSpecifications.ideplugin/Contents/Resources/Darwin Package Types.xcspec
   packageTypesForMacOSXPath="/Volumes/disk1t/Applications/Xcode_13.app/Contents/PlugIns/XCBSpecifications.ideplugin/Contents/Resources/Darwin Package Types.xcspec"
   #/Applications/Xcode_13.app/Contents/PlugIns/XCBSpecifications.ideplugin/Contents/Resources/Darwin Product Types.xcspec
-  productTypesForMacOSXPath="/Volumes/disk1t/Applications/Xcode_13.app/Contents/PlugIns/XCBSpecifications.ideplugin/Contents/Resources/Darwin Product Types.xcspec";;
+  productTypesForMacOSXPath="/Volumes/disk1t/Applications/Xcode_13.app/Contents/PlugIns/XCBSpecifications.ideplugin/Contents/Resources/Darwin Product Types.xcspec"
+
+  requireFile "$packageTypesForMacOSXPath" false
+  requireFile "$productTypesForMacOSXPath" false
+
+
+  echo "开始处理Package Types.xcspec"
+  if [[ $hasPackageTypeForCommandLineTool != "true" ]]; then
+    machoDict=`readXcodeSpecificationById "$packageTypesForMacOSXPath" "com.apple.package-type.mach-o-executable"`
+    echo "筛选结果: $machoDict"
+    echo "Package Types.xcspec处理完成"
+    writeDictToSpecification "$specificationFile" "$machoDict"
+  else
+    echo "Embedded-Device.xcspec已被处理过, 跳过"
+  fi
+
+  echo "开始处理Product Types.xcspec"
+  if [[ $hasProductTypeForCommandLineTool != "true" ]]; then
+    toolDict=`readXcodeSpecificationById "$productTypesForMacOSXPath" "com.apple.product-type.tool"`
+    echo "筛选结果: $toolDict"
+    echo "Product Types.xcspec处理完成"
+    writeDictToSpecification "$specificationFile" "$toolDict"
+  else
+    echo "Embedded-Device.xcspec已被处理过, 跳过"
+  fi;;
 "Xcode 14.0")
-  echo "当前Xcode版本为: Xcode14. 该版本的Command Line Tool工程处于BETA阶段..."
+  #Xcode 14.0
+  #Build version 14A5228q
+  echo "当前Xcode版本为: Xcode_14-beta. 该版本的Command Line Tool工程处于BETA阶段..."
+  #/Applications/Xcode_13.app/Contents/Developer/Platforms/iPhoneOS.platform
+  iosSdkPlatformPath=`getSdkProperty iphoneos PlatformPath`
+  echo $iosSdkPlatformPath
+  exit 255
+  #/Applications/Xcode_13.app/Contents/Developer/Platforms/MacOSX.platform
+  macosSdkPlatformPath=`getSdkProperty macosx PlatformPath`
+
+  # /Applications/Xcode_13.app/Contents/PlugIns/IDEiOSSupportCore.ideplugin/Contents/Resources/Embedded-Device.xcspec
+  specificationFile=$(cd $iosSdkPlatformPath/../../.. && pwd)/PlugIns/IDEiOSSupportCore.ideplugin/Contents/Resources/Embedded-Device.xcspec
+
+
+  #Xcode 14 beta
+  #/Volumes/disk1t/Applications/Xcode_14-beta.app/Contents/PlugIns/XCBSpecifications.ideplugin/Contents/Resources/Embedded-Device.xcspec
+
+
+  requireFile "$specificationFile" false
+
+  #backup
+  requireBackup "$specificationFile"
+
+  hasPackageTypeForCommandLineTool=`doesFileContain "$specificationFile" 'com.apple.package-type.mach-o-executable'`
+  hasProductTypeForCommandLineTool=`doesFileContain "$specificationFile" 'com.apple.product-type.tool'`
+
+  #/Applications/Xcode_13.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Xcode/Specifications
+  macosxSDKSpecificationsPath=$macosSdkPlatformPath/Developer/Library/Xcode/Specifications
+
+  #/Applications/Xcode_13.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Xcode/PrivatePlugIns/IDEOSXSupportCore.ideplugin/Contents/Resources/MacOSX Package Types.xcspec
+  packageTypesForMacOSXPath="$macosxSDKSpecificationsPath/MacOSX Package Types.xcspec"
+  #/Applications/Xcode_13.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Xcode/PrivatePlugIns/IDEOSXSupportCore.ideplugin/Contents/Resources/MacOSX Product Types.xcspec
+  productTypesForMacOSXPath="$macosxSDKSpecificationsPath/MacOSX Product Types.xcspec"
+
   #/Applications/Xcode_13.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Xcode/PrivatePlugIns/IDEOSXSupportCore.ideplugin/Contents/Resources/
   macosxSDKSpecificationsPath=$macosSdkPlatformPath/Developer/Library/Xcode/PrivatePlugIns/IDEOSXSupportCore.ideplugin/Contents/Resources
   #/Applications/Xcode_13.app/Contents/PlugIns/XCBSpecifications.ideplugin/Contents/Resources/Darwin Package Types.xcspec
   packageTypesForMacOSXPath="/Volumes/disk1t/Applications/Xcode_14-beta.app/Contents/PlugIns/XCBSpecifications.ideplugin/Contents/Resources/Darwin Package Types.xcspec"
   #/Applications/Xcode_13.app/Contents/PlugIns/XCBSpecifications.ideplugin/Contents/Resources/Darwin Product Types.xcspec
-  productTypesForMacOSXPath="/Volumes/disk1t/Applications/Xcode_14-beta.app/Contents/PlugIns/XCBSpecifications.ideplugin/Contents/Resources/Darwin Product Types.xcspec";;
+  productTypesForMacOSXPath="/Volumes/disk1t/Applications/Xcode_14-beta.app/Contents/PlugIns/XCBSpecifications.ideplugin/Contents/Resources/Darwin Product Types.xcspec"
+
+  requireFile "$packageTypesForMacOSXPath" false
+  requireFile "$productTypesForMacOSXPath" false
+
+
+  echo "开始处理Package Types.xcspec"
+  if [[ $hasPackageTypeForCommandLineTool != "true" ]]; then
+    machoDict=`readXcodeSpecificationById "$packageTypesForMacOSXPath" "com.apple.package-type.mach-o-executable"`
+    echo "筛选结果: $machoDict"
+    echo "Package Types.xcspec处理完成"
+    writeDictToSpecification "$specificationFile" "$machoDict"
+  else
+    echo "Embedded-Device.xcspec已被处理过, 跳过"
+  fi
+
+  echo "开始处理Product Types.xcspec"
+  if [[ $hasProductTypeForCommandLineTool != "true" ]]; then
+    toolDict=`readXcodeSpecificationById "$productTypesForMacOSXPath" "com.apple.product-type.tool"`
+    echo "筛选结果: $toolDict"
+    echo "Product Types.xcspec处理完成"
+    writeDictToSpecification "$specificationFile" "$toolDict"
+  else
+    echo "Embedded-Device.xcspec已被处理过, 跳过"
+  fi;;
 *)
-  echo "无法识别的Xcode版本"
-  exit 255;;
+  echo "无法识别的Xcode版本, 按老版本xcode处理"
+#  exit 255;;
+  #Xcode 13.0
+  #Build version 13A233
+  #echo "当前Xcode版本为: Xcode13. 该版本的Command Line Tool工程处于BETA阶段..."
+  #/Applications/Xcode_13.app/Contents/Developer/Platforms/iPhoneOS.platform
+  iosSdkPlatformPath=`getSdkProperty iphoneos PlatformPath`
+  #/Applications/Xcode_13.app/Contents/Developer/Platforms/MacOSX.platform
+  macosSdkPlatformPath=`getSdkProperty macosx PlatformPath`
+
+  # /Applications/Xcode_13.app/Contents/PlugIns/IDEiOSSupportCore.ideplugin/Contents/Resources/Embedded-Device.xcspec
+  specificationFile=$(cd $iosSdkPlatformPath/../../.. && pwd)/PlugIns/IDEiOSSupportCore.ideplugin/Contents/Resources/Embedded-Device.xcspec
+
+  requireFile "$specificationFile" false
+
+  #backup
+  requireBackup "$specificationFile"
+
+  hasPackageTypeForCommandLineTool=`doesFileContain "$specificationFile" 'com.apple.package-type.mach-o-executable'`
+  hasProductTypeForCommandLineTool=`doesFileContain "$specificationFile" 'com.apple.product-type.tool'`
+
+  #/Applications/Xcode_13.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Xcode/Specifications
+  macosxSDKSpecificationsPath=$macosSdkPlatformPath/Developer/Library/Xcode/Specifications
+
+  #/Applications/Xcode_13.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Xcode/PrivatePlugIns/IDEOSXSupportCore.ideplugin/Contents/Resources/MacOSX Package Types.xcspec
+  packageTypesForMacOSXPath="$macosxSDKSpecificationsPath/MacOSX Package Types.xcspec"
+  #/Applications/Xcode_13.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Xcode/PrivatePlugIns/IDEOSXSupportCore.ideplugin/Contents/Resources/MacOSX Product Types.xcspec
+  productTypesForMacOSXPath="$macosxSDKSpecificationsPath/MacOSX Product Types.xcspec"
+
+  requireFile "$packageTypesForMacOSXPath" false
+  requireFile "$productTypesForMacOSXPath" false
+
+
+  echo "开始处理Package Types.xcspec"
+  if [[ $hasPackageTypeForCommandLineTool != "true" ]]; then
+    machoDict=`readXcodeSpecificationById "$packageTypesForMacOSXPath" "com.apple.package-type.mach-o-executable"`
+    echo "筛选结果: $machoDict"
+    echo "Package Types.xcspec处理完成"
+    writeDictToSpecification "$specificationFile" "$machoDict"
+  else
+    echo "Embedded-Device.xcspec已被处理过, 跳过"
+  fi
+
+  echo "开始处理Product Types.xcspec"
+  if [[ $hasProductTypeForCommandLineTool != "true" ]]; then
+    toolDict=`readXcodeSpecificationById "$productTypesForMacOSXPath" "com.apple.product-type.tool"`
+    echo "筛选结果: $toolDict"
+    echo "Product Types.xcspec处理完成"
+    writeDictToSpecification "$specificationFile" "$toolDict"
+  else
+    echo "Embedded-Device.xcspec已被处理过, 跳过"
+  fi;;
 esac
 
 
-requireFile "$packageTypesForMacOSXPath" false
-requireFile "$productTypesForMacOSXPath" false
-
-
-echo "开始处理Package Types.xcspec"
-if [[ $hasPackageTypeForCommandLineTool != "true" ]]; then
-	machoDict=`readXcodeSpecificationById "$packageTypesForMacOSXPath" "com.apple.package-type.mach-o-executable"`
-	echo "筛选结果: $machoDict"
-  echo "Package Types.xcspec处理完成"
-	writeDictToSpecification "$specificationFile" "$machoDict"
-else
-  echo "Embedded-Device.xcspec已被处理过, 跳过"
-fi
-
-echo "开始处理Product Types.xcspec"
-if [[ $hasProductTypeForCommandLineTool != "true" ]]; then
-	toolDict=`readXcodeSpecificationById "$productTypesForMacOSXPath" "com.apple.product-type.tool"`
-	echo "筛选结果: $toolDict"
-  echo "Product Types.xcspec处理完成"
-	writeDictToSpecification "$specificationFile" "$toolDict"
-else
-  echo "Embedded-Device.xcspec已被处理过, 跳过"
-fi
 
 exit 0
