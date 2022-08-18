@@ -105,6 +105,7 @@ function checkApp()
 
   echo "执行命令/opt/MonkeyDev/bin/monkeyparser  MONKEYDEV_CLASS_DUMP=[${MONKEYDEV_CLASS_DUMP}] MONKEYDEV_RESTORE_SYMBOL=[${MONKEYDEV_RESTORE_SYMBOL}]"
 	echo "export MONKEYDEV_CLASS_DUMP=${MONKEYDEV_CLASS_DUMP};MONKEYDEV_RESTORE_SYMBOL=${MONKEYDEV_RESTORE_SYMBOL}; $MONKEYPARSER verify -t ${TARGET_APP_PATH} -o ${SRCROOT}/${TARGET_NAME}"
+	echo "单独的class-dump命令: /Volumes/disk1t/Desktop/AI/ios/class-dump-skfly  -a -A -H -o ./class-dump_header/  目标mach-o文件"
 	VERIFY_RESULT=`export MONKEYDEV_CLASS_DUMP=${MONKEYDEV_CLASS_DUMP};MONKEYDEV_RESTORE_SYMBOL=${MONKEYDEV_RESTORE_SYMBOL};"$MONKEYPARSER" verify -t "${TARGET_APP_PATH}" -o "${SRCROOT}/${TARGET_NAME}"`
   echo "VERIFY_RESULT= $VERIFY_RESULT"
 	if [[ $? -eq 16 ]]; then
